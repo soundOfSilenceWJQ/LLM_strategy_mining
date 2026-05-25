@@ -1,0 +1,7 @@
+﻿factor_name,weight,risk_level,historical_ic,rationale
+fund_pb,0.2,低,0.0,当前地产稳增长政策落地，地产板块估值处于历史低位，fund_pb（市净率）可筛选估值合理、安全边际高的地产及周期标的，契合政策驱动下的估值修复逻辑
+quality_gross_profit_margin,0.19,中,0.0,8月PMI边际企稳，周期板块需求边际改善，quality_gross_profit_margin（毛利率）可筛选盈利质量扎实、需求修复弹性大的周期标的，契合周期复苏的基本面逻辑
+growth_revenue_yoy,0.18,中,0.0,美联储加息预期降温利好科创板块估值，growth_revenue_yoy（营收同比增速）可筛选科创板块中成长确定性高的标的，契合科创主线的投资逻辑
+quality_operating_margin,0.17,低,0.0,地产及周期板块复苏过程中，quality_operating_margin（运营利润率）反映企业成本控制能力，高运营利润率标的盈利修复速度更快，契合稳增长的基本面要求
+fund_cashflow_yield,0.16,低,0.0,当前市场处于中性偏谨慎阶段，fund_cashflow_yield（现金流收益率）可筛选现金储备充足、抗风险能力强的标的，契合风控要求，同时受益于稳增长政策的现金流改善标的更具配置价值
+quality_asset_turnover,0.1,中,0.0,地产和周期板块复苏阶段，quality_asset_turnover（资产周转率）反映资产运营效率，高周转率标的可提升盈利水平，契合稳增长的资产利用逻辑

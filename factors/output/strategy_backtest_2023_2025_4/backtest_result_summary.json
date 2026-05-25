@@ -1,0 +1,59 @@
+{
+  "selected_months": [
+    "2023-09",
+    "2023-10",
+    "2023-11",
+    "2023-12",
+    "2024-01",
+    "2024-02",
+    "2024-03",
+    "2024-04",
+    "2024-05",
+    "2024-06",
+    "2024-07",
+    "2024-08",
+    "2024-09",
+    "2024-10",
+    "2024-11",
+    "2024-12",
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12"
+  ],
+  "selected_factor_count": 79,
+  "rotation_strategy_summary": [
+    {
+      "strategy_name": "monthly_rotation",
+      "total_return": 0.9214655008139188,
+      "annual_return": 0.33815110100858004,
+      "annual_volatility": 0.3073920111916936,
+      "sharpe": 1.100064701413807,
+      "max_drawdown": -0.05722787274661656,
+      "n_days": 565,
+      "n_months": 28,
+      "n_unique_factors": 79
+    },
+    {
+      "strategy_name": "all_factors_equal_weight",
+      "total_return": 0.21342016884968817,
+      "annual_return": 0.09011040827348427,
+      "annual_volatility": 0.1973194158642288,
+      "sharpe": 0.45667279055542753,
+      "max_drawdown": -0.07469397546852208,
+      "n_days": 565,
+      "n_months": 28,
+      "n_unique_factors": 0
+    }
+  ],
+  "rotation_daily_rows": 565,
+  "all_factor_daily_rows": 565
+}
