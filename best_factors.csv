@@ -1,0 +1,2 @@
+name,expression,ic_mean,ic_ir,rank_ic_mean,rank_ic_ir
+STD,"Std($close, 20)/$close",0.02398832113989428,0.35287467476886847,0.08073807190649106,0.5500968990713361

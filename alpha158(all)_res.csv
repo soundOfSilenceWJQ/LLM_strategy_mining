@@ -1,0 +1,2 @@
+﻿factor_name,expression,rebalance_freq,ic_mean,ic_ir,rank_ic_mean,rank_ic_ir,status
+STD,"Std($close, 20)/$close",20,-0.003641182578139239,-0.02559460080335194,-0.018236162564317912,-0.11447206128661172,SUCCESS
