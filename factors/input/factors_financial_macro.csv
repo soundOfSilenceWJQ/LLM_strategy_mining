@@ -1,9 +1,9 @@
 name,expression
 fund_pe,"$close/$eps"
 fund_pb,"$close/$bvps"
-fund_dividend_yield,"$dividends_per_share/$close"
-fund_sales_to_price,"$sales/$close"
-fund_cashflow_yield,"$operating_cash_flow/$close"
+fund_dividend_yield,"$close/$dividends_per_share"
+fund_sales_to_price,"$close/$sales_per_share"
+fund_cashflow_yield,"$close/$operating_cash_flow_per_share"
 
 quality_gross_profit_margin,"$gross_profit/$revenue"
 quality_operating_margin,"$operating_income/$revenue"

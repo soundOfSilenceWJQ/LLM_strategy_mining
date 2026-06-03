@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-06-03T16:16:33",
+  "total_symbols": 1,
+  "endpoints": {
+    "stock_financial_analysis_indicator": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_financial_analysis_indicator"
+    },
+    "stock_financial_abstract": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_financial_abstract"
+    },
+    "stock_financial_report_sina_balance_sheet": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_financial_report_sina_balance_sheet"
+    },
+    "stock_financial_report_sina_income_statement": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_financial_report_sina_income_statement"
+    },
+    "stock_financial_report_sina_cash_flow": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_financial_report_sina_cash_flow"
+    },
+    "stock_dividend_cninfo": {
+      "ok": 0,
+      "skipped": 1,
+      "failed": 0,
+      "failed_examples": [],
+      "cache_dir": "data\\hs300_stock_cache\\stock_dividend_cninfo"
+    }
+  }
+}

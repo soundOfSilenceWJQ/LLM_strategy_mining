@@ -16,316 +16,19 @@ import sys
 
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr
+from scipy.stats import pearsonr, spearmanr
 from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from factors.config import MultiFactorBacktestConfig
+from factors.multi_factor_load import (
+    infer_effective_date_range_from_frames,
+    load_factor_cache,
+    load_factors_from_csv,
+)
 
 logger = logging.getLogger(__name__)
-
-
-def sanitize_factor_name(name: str) -> str:
-    """Convert factor name into a filesystem-safe file stem."""
-    sanitized = [ch if ch.isalnum() or ch in {"-", "_"} else "_" for ch in name.strip()]
-    file_stem = "".join(sanitized).strip("_")
-    return file_stem or "factor"
-
-
-def load_factors_from_csv(input_file: Path) -> List[Tuple[str, str]]:
-    """Load factors from a csv file."""
-    if not input_file.exists() or not input_file.is_file():
-        raise ValueError(f"input file not found: {input_file}")
-
-    df = pd.read_csv(input_file)
-    if df.empty:
-        raise ValueError(f"Empty factor file: {input_file}")
-
-    factors: List[Tuple[str, str]] = []
-    name_keys = {"name", "factor", "factor_name"}
-    expr_keys = {"expression", "expr", "formula"}
-
-    norm_cols = {c.strip().lower(): c for c in df.columns}
-    name_col = next((norm_cols[k] for k in name_keys if k in norm_cols), None)
-    expr_col = next((norm_cols[k] for k in expr_keys if k in norm_cols), None)
-
-    if name_col is None or expr_col is None:
-        raise ValueError(
-            f"Invalid columns in {input_file.name}. Need name/factor/factor_name and expression/expr/formula."
-        )
-
-    for _, row in df.iterrows():
-        name = str(row[name_col]).strip()
-        expr = str(row[expr_col]).strip()
-        if not name or not expr or name.lower() == "nan" or expr.lower() == "nan":
-            continue
-        factors.append((name, expr))
-
-    if not factors:
-        raise ValueError(f"No valid factors parsed from {input_file}")
-
-    return factors
-
-
-def init_qlib_env(provider_uri: str, region: str = "cn") -> None:
-    """Initialize qlib environment with single-kernel threading backend for Windows compatibility."""
-    import importlib
-    import inspect
-
-    qlib = importlib.import_module("qlib")
-
-    provider_path = Path(provider_uri).expanduser()
-    resolved_path = provider_path.resolve() if provider_path.exists() else provider_path
-    calendar_file = provider_path / "calendars" / "day.txt"
-    if not calendar_file.exists():
-        raise FileNotFoundError(
-            "Invalid qlib provider data path. Missing calendars/day.txt under "
-            f"provider_uri={provider_uri} (resolved={resolved_path})."
-        )
-
-    qlib_init = getattr(qlib, "init", None) or getattr(qlib, "auto_init", None)
-    if qlib_init is None:
-        module_file = getattr(qlib, "__file__", "<unknown>")
-        raise RuntimeError(
-            "Imported module 'qlib' does not expose init/auto_init. "
-            f"Resolved module: {module_file}. "
-            "This usually means the wrong package is installed or imported. "
-            "Please ensure Microsoft pyqlib is installed in the active interpreter: pip install pyqlib, "
-            "and remove conflicting package(s): pip uninstall qlib."
-        )
-
-    # Keep compatibility with different pyqlib versions by passing only supported kwargs.
-    requested_kwargs = {
-        "provider_uri": provider_uri,
-        "region": region,
-        "expression_cache": None,
-        "kernels": 1,
-        "joblib_backend": "threading",
-    }
-    supported_kwargs = set(inspect.signature(qlib_init).parameters.keys())
-    init_kwargs = {k: v for k, v in requested_kwargs.items() if k in supported_kwargs}
-    qlib_init(**init_kwargs)
-    logger.info(f"Qlib initialized: provider_uri={provider_uri}, resolved={resolved_path}, region={region}")
-
-
-def resolve_effective_date_range(start_date: str, end_date: str) -> Tuple[str, str]:
-    """Clip requested date range to qlib calendar range.
-
-    Returns the effective [start_date, end_date] as YYYY-MM-DD strings.
-    Raises if there is no overlap.
-    """
-    from qlib.data import D
-
-    cal = D.calendar(freq="day")
-    if len(cal) == 0:
-        raise RuntimeError("Qlib calendar is empty. Please check provider data at provider_uri.")
-
-    cal_start = pd.Timestamp(cal[0]).normalize()
-    cal_end = pd.Timestamp(cal[-1]).normalize()
-    req_start = pd.Timestamp(start_date).normalize()
-    req_end = pd.Timestamp(end_date).normalize()
-
-    eff_start = max(req_start, cal_start)
-    eff_end = min(req_end, cal_end)
-
-    if eff_start > eff_end:
-        raise RuntimeError(
-            "Requested date range has no overlap with qlib data range. "
-            f"requested=[{req_start.date()}..{req_end.date()}], "
-            f"qlib=[{cal_start.date()}..{cal_end.date()}]."
-        )
-
-    if eff_start != req_start or eff_end != req_end:
-        logger.warning(
-            "Date range adjusted to qlib coverage: "
-            f"requested=[{req_start.date()}..{req_end.date()}], "
-            f"effective=[{eff_start.date()}..{eff_end.date()}], "
-            f"qlib=[{cal_start.date()}..{cal_end.date()}]"
-        )
-
-    return eff_start.strftime("%Y-%m-%d"), eff_end.strftime("%Y-%m-%d")
-
-
-def load_available_instruments(provider_uri: str) -> List[str]:
-    """Load available instruments from qlib features directory or fallback file.
-    
-    Args:
-        provider_uri: Path to qlib data directory
-        
-    Returns:
-        List of available stock codes (e.g., ['sz000001', 'sz000002', ...])
-    """
-    # Try to read from cached file first
-    fallback_file = Path(__file__).parent / "data" / "available_stocks_in_qlib.txt"
-    if fallback_file.exists():
-        try:
-            with open(fallback_file, 'r') as f:
-                stocks = [line.strip() for line in f if line.strip()]
-            logger.info(f"Loaded {len(stocks)} instruments from cache file: {fallback_file}")
-            return stocks
-        except Exception as e:
-            logger.warning(f"Failed to read cache file {fallback_file}: {e}")
-    
-    # Fallback: read directly from features directory
-    features_dir = Path(provider_uri) / "features"
-    if features_dir.exists():
-        try:
-            stocks = sorted([d.name for d in features_dir.iterdir() if d.is_dir()])
-            logger.info(f"Loaded {len(stocks)} instruments from features directory")
-            return stocks
-        except Exception as e:
-            logger.warning(f"Failed to read features directory {features_dir}: {e}")
-    
-    raise RuntimeError(f"Cannot load available instruments from {provider_uri}")
-
-
-def load_multi_factor_frame(
-    factors: List[Tuple[str, str]],
-    instruments: str,
-    start_date: str,
-    end_date: str,
-    provider_uri: str = "D:/qlib_data/cn_data",
-    cache_dir: Path | None = None,
-) -> Tuple[Dict[str, pd.DataFrame], List[Dict[str, str]]]:
-    """
-    Load multiple factor expressions using qlib D.features in a single call.
-
-    Args:
-        factors: List of (name, expression) tuples
-        instruments: Instruments string (e.g., 'csi300') - used for logging only
-        start_date: Start date string
-        end_date: End date string
-        provider_uri: Path to qlib data directory
-        cache_dir: Optional cache directory. If provided, each loaded factor is persisted immediately.
-
-    Returns:
-        Dict mapping factor_name -> DataFrame with factor values and labels.
-    """
-    # Import D after qlib.init() has been called
-    from qlib.data import D
-
-    # Resolve instruments: read from features directory, not from D.instruments()
-    instruments_obj = load_available_instruments(provider_uri)
-    logger.info(f"Instruments resolved: {len(instruments_obj)} stocks (from {instruments})")
-
-    logger.info(f"Loading {len(factors)} factors (robust mode)")
-
-    result: Dict[str, pd.DataFrame] = {}
-    errors: List[Dict[str, str]] = []
-
-    if cache_dir is not None:
-        cache_dir.mkdir(parents=True, exist_ok=True)
-
-    for name, expr in factors:
-        try:
-            raw = D.features(
-                instruments_obj,
-                [expr, "Ref($close,-1)/$close-1"],
-                start_time=start_date,
-                end_time=end_date,
-                freq="day",
-            )
-            factor_df = raw.copy()
-            factor_df.columns = ["factor", "label"]
-            result[name] = factor_df
-            logger.info(f"Factor '{name}' loaded: shape={factor_df.shape}, nulls={factor_df.isnull().sum().sum()}")
-
-            if cache_dir is not None:
-                cache_file = cache_dir / f"{sanitize_factor_name(name)}.pkl"
-                factor_df.to_pickle(cache_file)
-                logger.info(f"Factor '{name}' cached immediately -> {cache_file}")
-        except Exception as e:
-            logger.warning(f"Skip factor '{name}' in load stage: {e}")
-            errors.append(
-                {
-                    "factor": name,
-                    "stage": "load",
-                    "error": str(e),
-                    "expression": expr,
-                }
-            )
-
-    return result, errors
-
-
-def save_factor_cache(
-    factor_frames: Dict[str, pd.DataFrame],
-    factors: List[Tuple[str, str]],
-    cache_dir: Path,
-    effective_start_date: str,
-    effective_end_date: str,
-    errors: List[Dict[str, str]],
-) -> Dict[str, str]:
-    """Persist computed factor frames to cache files."""
-    cache_dir.mkdir(parents=True, exist_ok=True)
-
-    factor_file_map: Dict[str, str] = {}
-
-    for factor_name, factor_df in factor_frames.items():
-        cache_file = cache_dir / f"{sanitize_factor_name(factor_name)}.pkl"
-        factor_df.to_pickle(cache_file)
-        factor_file_map[factor_name] = cache_file.name
-        logger.info(f"Cached factor '{factor_name}' -> {cache_file}")
-
-    if errors:
-        pd.DataFrame(errors).to_csv(cache_dir / "cache_errors.csv", index=False)
-
-    return factor_file_map
-
-
-def load_factor_cache(
-    factors: List[Tuple[str, str]],
-    cache_dir: Path,
-) -> Tuple[Dict[str, pd.DataFrame], List[Dict[str, str]]]:
-    """Load cached factor frames from disk."""
-
-    factor_frames: Dict[str, pd.DataFrame] = {}
-    errors: List[Dict[str, str]] = []
-    for factor_name, expr in factors:
-        cache_name = f"{sanitize_factor_name(factor_name)}.pkl"
-        cache_file = cache_dir / cache_name
-        if not cache_file.exists():
-            errors.append(
-                {
-                    "factor": factor_name,
-                    "stage": "cache_load",
-                    "error": f"Cache file not found: {cache_file}",
-                    "expression": expr,
-                }
-            )
-            continue
-
-        factor_df = pd.read_pickle(cache_file)
-        factor_frames[factor_name] = factor_df
-        logger.info(f"Loaded cached factor '{factor_name}': shape={factor_df.shape}, file={cache_file}")
-
-    return factor_frames, errors
-
-
-def infer_effective_date_range_from_frames(factor_frames: Dict[str, pd.DataFrame]) -> Tuple[str, str]:
-    """Infer cached data coverage from the loaded factor frames."""
-    # 只取每个 DataFrame 的 min/max 日期，避免将全部行展开到内存。
-    min_dates: List[pd.Timestamp] = []
-    max_dates: List[pd.Timestamp] = []
-    for factor_df in factor_frames.values():
-        if factor_df.empty:
-            continue
-        index_dates = (
-            factor_df.index.get_level_values("datetime")
-            if "datetime" in factor_df.index.names
-            else factor_df.index.get_level_values(1)
-        )
-        dt_index = pd.to_datetime(index_dates)
-        min_dates.append(dt_index.min())
-        max_dates.append(dt_index.max())
-
-    if not min_dates:
-        raise RuntimeError("Cannot infer effective date range from empty factor cache.")
-
-    min_date = min(min_dates).normalize()
-    max_date = max(max_dates).normalize()
-    return min_date.strftime("%Y-%m-%d"), max_date.strftime("%Y-%m-%d")
 
 
 def run_top_quantile_backtest(
@@ -369,6 +72,7 @@ def run_top_quantile_backtest(
 
     records = []
     daily_ics = []
+    daily_rank_ics = []
     prev_long_holdings = set()
     prev_short_holdings = set()
 
@@ -379,12 +83,18 @@ def run_top_quantile_backtest(
             if len(group_clean) < 2:
                 continue
 
-            # Compute IC for the day
-            sp_result: Any = spearmanr(group_clean["factor"].values, group_clean["label"].values)
-            ic_raw = sp_result.statistic if hasattr(sp_result, "statistic") else sp_result[0]
+            # Compute IC (Pearson) and Rank IC (Spearman) for the day
+            pr_result: Any = pearsonr(group_clean["factor"].values, group_clean["label"].values)
+            ic_raw = pr_result.statistic if hasattr(pr_result, "statistic") else pr_result[0]
             ic_value = float(ic_raw)
             if not np.isnan(ic_value):
                 daily_ics.append((dt, ic_value))
+
+            sp_result: Any = spearmanr(group_clean["factor"].values, group_clean["label"].values)
+            rank_ic_raw = sp_result.statistic if hasattr(sp_result, "statistic") else sp_result[0]
+            rank_ic_value = float(rank_ic_raw)
+            if not np.isnan(rank_ic_value):
+                daily_rank_ics.append((dt, rank_ic_value))
 
             # Long: top quantile selection
             top_threshold = group_clean["factor"].quantile(1 - top_quantile)
@@ -442,6 +152,7 @@ def run_top_quantile_backtest(
     return {
         "daily_results": daily_df,
         "daily_ics": daily_ics,
+        "daily_rank_ics": daily_rank_ics,
     }
 
 
@@ -461,6 +172,7 @@ def summarize(
     """
     daily_results = backtest_output["daily_results"]
     daily_ics = backtest_output["daily_ics"]
+    daily_rank_ics = backtest_output["daily_rank_ics"]
 
     days = len(daily_results)
 
@@ -478,6 +190,11 @@ def summarize(
     ic_std = np.std(ic_values, ddof=1) if len(ic_values) > 1 else 0.0
     ic_ir = ic_mean / ic_std if ic_std > 0 else 0.0
 
+    rank_ic_values = [rank_ic for _, rank_ic in daily_rank_ics]
+    rank_ic_mean = np.mean(rank_ic_values) if rank_ic_values else 0.0
+    rank_ic_std = np.std(rank_ic_values, ddof=1) if len(rank_ic_values) > 1 else 0.0
+    rank_ic_ir = rank_ic_mean / rank_ic_std if rank_ic_std > 0 else 0.0
+
     return {
         "factor_name": factor_name,
         "annual_return": annual_return,
@@ -487,64 +204,10 @@ def summarize(
         "ic_mean": ic_mean,
         "ic_std": ic_std,
         "ic_ir": ic_ir,
+        "rank_ic_mean": rank_ic_mean,
+        "rank_ic_std": rank_ic_std,
+        "rank_ic_ir": rank_ic_ir,
         "days": days,
-    }
-
-
-def prepare_factor_cache(config: MultiFactorBacktestConfig, cache_dir: Path) -> Dict[str, Any]:
-    """Compute factors with qlib and persist them under factors/factor_cache."""
-    config.validate()
-    init_qlib_env(config.provider_uri, config.region)
-
-    effective_start_date, effective_end_date = resolve_effective_date_range(config.start_date, config.end_date)
-    factor_frames, factor_errors = load_multi_factor_frame(
-        config.factors,
-        config.instruments,
-        effective_start_date,
-        effective_end_date,
-        provider_uri=config.provider_uri,
-        cache_dir=cache_dir,
-    )
-
-    non_empty_factor_frames: Dict[str, pd.DataFrame] = {}
-    for factor_name, factor_df in factor_frames.items():
-        if factor_df.empty:
-            expr = next((x[1] for x in config.factors if x[0] == factor_name), "")
-            factor_errors.append(
-                {
-                    "factor": factor_name,
-                    "stage": "load",
-                    "error": "Empty factor frame in effective date range",
-                    "expression": expr,
-                }
-            )
-        else:
-            non_empty_factor_frames[factor_name] = factor_df
-
-    if not non_empty_factor_frames:
-        config.output_dir.mkdir(parents=True, exist_ok=True)
-        error_file = cache_dir / "cache_errors.csv"
-        if factor_errors:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            pd.DataFrame(factor_errors).to_csv(error_file, index=False)
-        raise RuntimeError(
-            f"No factor loaded successfully. Errors saved to {error_file if factor_errors else 'N/A'}"
-        )
-
-    factor_file_map: Dict[str, str] = {
-        factor_name: f"{sanitize_factor_name(factor_name)}.pkl"
-        for factor_name in non_empty_factor_frames
-    }
-
-    if factor_errors:
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame(factor_errors).to_csv(cache_dir / "cache_errors.csv", index=False)
-
-    return {
-        "effective_start_date": effective_start_date,
-        "effective_end_date": effective_end_date,
-        "factor_files": factor_file_map,
-        "errors": factor_errors,
     }
 
 
@@ -595,8 +258,9 @@ def run_backtest_from_factor_frames(
             daily_df["factor"] = factor_name
             all_daily_results.append(daily_df)
 
-            ic_df = pd.DataFrame(backtest_output["daily_ics"], columns=["datetime", factor_name])
-            ic_df = ic_df.set_index("datetime")
+            ic_df = pd.DataFrame(backtest_output["daily_ics"], columns=["datetime", f"{factor_name}_ic"]).set_index("datetime")
+            rank_ic_df = pd.DataFrame(backtest_output["daily_rank_ics"], columns=["datetime", f"{factor_name}_rank_ic"]).set_index("datetime")
+            ic_df = ic_df.join(rank_ic_df, how="outer")
             all_ic_series.append(ic_df)
 
             curve_df = pd.DataFrame(
@@ -719,17 +383,6 @@ def run_multi_factor_backtest_from_cache(
     )
 
 
-def run_multi_factor_backtest(
-    config: MultiFactorBacktestConfig,
-    output_prefix: str = "multi_factor",
-    cache_dir: Path | None = None,
-) -> Dict:
-    """Compute factors first, optionally cache them, then run the backtest."""
-    target_cache_dir = cache_dir or Path("factors/factor_cache")
-    prepare_factor_cache(config, target_cache_dir)
-    return run_multi_factor_backtest_from_cache(config, target_cache_dir, output_prefix=output_prefix)
-
-
 def main() -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -740,15 +393,14 @@ def main() -> int:
     provider_uri = "D:/qlib_data/cn_data"
     region = "cn"
     instruments = "csi300"
-    input_file = "D:/wjq/learning/grad_project/data/factors/input/factors_merged_positive_eco.csv"  # 或直接指定csv路径，如 "factors/input/factors.csv"
+    input_file = "D:/wjq/working/citic/codes_wjq(1)/factors/input/one_factor_test.csv"  # 或直接指定csv路径，如 "factors/input/factors.csv"
     start_date = "2023-09-01"
     end_date = "2025-12-31"
     top_quantile = 0.2
     transaction_cost = 0.0015
-    output_dir = "factors/output/multi_factor_2023_2025_4"
-    output_prefix = "multi_factor_2023_2025_4"
-    factor_cache_dir = "factors/factor_cache_2023_2025_4"
-    rebuild_factor_cache = True
+    output_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/output/one_factor_backtest_py312_rerun"
+    output_prefix = "one_factor_py312_rerun"
+    factor_cache_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/factor_cache_one_factor_py312_rerun"
 
     try:
         factor_csv = Path(input_file) if input_file else Path("factors/input/factors.csv")
@@ -768,11 +420,7 @@ def main() -> int:
         )
 
         cache_dir = Path(factor_cache_dir)
-        if rebuild_factor_cache:
-            logger.info("Computing and caching factors before backtest...")
-            prepare_factor_cache(config, cache_dir)
-
-        logger.info("Starting multi-factor backtest from cached factors...")
+        logger.info("Starting multi-factor backtest from preloaded cache...")
         result = run_multi_factor_backtest_from_cache(config, cache_dir, output_prefix=output_prefix)
         print(json.dumps(result, indent=2, default=str))
         logger.info("Backtest completed successfully.")
