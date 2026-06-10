@@ -1,1 +1,3 @@
-# llm_quant/__init__.py
+from llm_quant.pipelines import IntegratedSignalPipeline
+
+__all__ = ["IntegratedSignalPipeline"]

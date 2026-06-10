@@ -4,51 +4,8 @@ import json
 from datetime import datetime
 from typing import Any
 
+from llm_quant.prompts import INFO_SUMMARIZER_SYSTEM_PROMPT, render_info_summarizer_user_prompt
 from llm_quant.utils.llm_client import LLMClient
-
-
-SYSTEM_PROMPT = (
-    "你是一名资深宏观与策略研究员，负责把某一天内的新闻与研报单条解读结果整合成日度投资综述。"
-    "请从市场主线、定价逻辑、风险点和投资建议四个维度做归纳，只输出 JSON。"
-)
-
-
-USER_PROMPT_TEMPLATE = """请根据以下某一天内的单条分析结果，输出日度综述，只返回 JSON。
-
-【日期】
-{date}
-
-【样本统计】
-news_count: {news_count}
-report_count: {report_count}
-item_count: {item_count}
-
-【单条分析摘录】
-{context}
-
-【输出要求】
-1. 全部用中文。
-2. 结论要以“当天市场信息综合”视角输出，不要逐条复述。
-3. 建议审慎，说明不确定性来源。
-4. 字段名固定，字段值中文。
-
-【JSON Schema】
-{{
-  "market_overview": "对当天信息面的总体概括，150字以内",
-  "dominant_themes": ["主线1", "主线2", "主线3"],
-  "pricing_logic_summary": "归纳当天最重要的定价逻辑链条",
-  "bullish_signals": ["偏利多信号1", "偏利多信号2"],
-  "bearish_signals": ["偏利空信号1", "偏利空信号2"],
-  "investor_advice": {{
-    "stance": "偏积极|中性|偏谨慎",
-    "short_term": "短线应对建议",
-    "swing_term": "波段应对建议",
-    "risk_controls": ["风控1", "风控2"]
-  }},
-  "watch_list": ["需要继续跟踪的方向1", "方向2"],
-  "uncertainties": ["不确定性1", "不确定性2"]
-}}
-"""
 
 
 class InfoBasedSummarizerAgent:
@@ -69,7 +26,7 @@ class InfoBasedSummarizerAgent:
         if self.llm is None:
             summary = self._fallback_summary(analyzed_rows)
         else:
-            prompt = USER_PROMPT_TEMPLATE.format(
+            prompt = render_info_summarizer_user_prompt(
                 date=date,
                 news_count=news_count,
                 report_count=report_count,
@@ -77,7 +34,11 @@ class InfoBasedSummarizerAgent:
                 context=context[:12000],
             )
             try:
-                resp = self.llm.chat(user_message=prompt, system_prompt=SYSTEM_PROMPT, max_tokens=3000)
+                resp = self.llm.chat(
+                    user_message=prompt,
+                    system_prompt=INFO_SUMMARIZER_SYSTEM_PROMPT,
+                    max_tokens=3000,
+                )
                 summary = self._parse_json(resp)
             except Exception:
                 summary = self._fallback_summary(analyzed_rows)

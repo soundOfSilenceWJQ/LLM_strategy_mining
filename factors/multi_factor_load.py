@@ -98,8 +98,10 @@ def init_qlib_env(provider_uri: str, region: str = "cn") -> None:
         "kernels": 1,
         "joblib_backend": "threading",
     }
-    supported_kwargs = set(inspect.signature(qlib_init).parameters.keys())
-    init_kwargs = {k: v for k, v in requested_kwargs.items() if k in supported_kwargs}
+    parameters = inspect.signature(qlib_init).parameters
+    accepts_var_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in parameters.values())
+    supported_kwargs = set(parameters.keys())
+    init_kwargs = requested_kwargs if accepts_var_kwargs else {k: v for k, v in requested_kwargs.items() if k in supported_kwargs}
     qlib_init(**init_kwargs)
     logger.info(f"Qlib initialized: provider_uri={provider_uri}, resolved={resolved_path}, region={region}")
 
@@ -333,13 +335,13 @@ def main() -> int:
     provider_uri = "D:/qlib_data/cn_data"
     region = "cn"
     instruments = "csi300"
-    input_file = "D:/wjq/working/citic/codes_wjq(1)/factors/input/one_factor_test.csv"
+    input_file = "D:/wjq/working/citic/codes_wjq(1)/factors/input/factors_financial_stmt_formulas.csv"
     start_date = "2023-09-01"
     end_date = "2025-12-31"
     top_quantile = 0.2
     transaction_cost = 0.0015
-    output_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/output/one_factor_backtest_py312_rerun"
-    factor_cache_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/factor_cache_one_factor_py312_rerun"
+    output_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/output/financial_stmt_backtest_py312"
+    factor_cache_dir = "D:/wjq/working/citic/codes_wjq(1)/factors/factor_cache_financial_stmt_py312"
 
     try:
         factor_csv = Path(input_file) if input_file else Path("factors/input/factors.csv")

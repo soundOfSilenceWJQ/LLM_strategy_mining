@@ -1,0 +1,62 @@
+{
+  "date": "2026-06-10",
+  "recommendation": {
+    "market_analysis": {
+      "current_regime": "2026年6月大盘震荡，成长风格占优",
+      "dominant_factors": [
+        "基本面成长因子",
+        "短期动量因子"
+      ],
+      "risk_factors": [
+        "风格切换风险",
+        "盈利预期波动风险"
+      ],
+      "macroeconomic_outlook": "宏观环境平稳，成长板块具备相对收益基础"
+    },
+    "recommended_factors": [
+      {
+        "factor_name": "eps_revision_30d",
+        "rationale": "成长股盈利预期上调将推动股价，契合当前成长风格",
+        "historical_ic": 0.0,
+        "recent_performance": "震荡市中成长板块盈利预期有修复迹象",
+        "expected_performance": "盈利修正将贡献成长股超额收益",
+        "weight": 0.6,
+        "risk_level": "低"
+      },
+      {
+        "factor_name": "momentum_20d",
+        "rationale": "震荡市中短期动量有效，捕捉成长股趋势性机会",
+        "historical_ic": 0.0,
+        "recent_performance": "成长股20日动量表现强于价值板块",
+        "expected_performance": "短期动量将辅助获取震荡市收益",
+        "weight": 0.4,
+        "risk_level": "低"
+      }
+    ],
+    "portfolio_composition": {
+      "total_weight": 1.0,
+      "concentration": "权重集中于成长相关的基本面与动量因子",
+      "diversification": "覆盖基本面与动量两类因子，分散单一维度风险"
+    },
+    "factors_to_avoid": [],
+    "implementation_suggestions": {
+      "rebalance_frequency": "月度调整",
+      "entry_timing": "震荡市中成长板块回调后布局",
+      "exit_signals": [
+        "成长风格切换为价值",
+        "盈利预期大幅下调"
+      ],
+      "monitoring_metrics": [
+        "成长股盈利预期变化",
+        "20日动量表现"
+      ]
+    },
+    "confidence_level": "中",
+    "uncertainty_sources": [
+      "市场风格突发切换",
+      "盈利预期修正不及预期"
+    ],
+    "next_review_date": "2026-07-10"
+  },
+  "processed_at": "2026-06-10T00:17:00"
+}

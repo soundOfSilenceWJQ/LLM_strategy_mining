@@ -36,7 +36,23 @@ META_DATA_DICT: dict[str, dict[str, str]] = {
 		"source_file": "stock_financial_analysis_indicator",
 		"column_name": "加权每股收益(元)",
 		"alignment_column": "日期",
-	}
+	},
+	"bps": {
+		"source_file": "stock_financial_analysis_indicator",
+		"column_name": "每股净资产_调整后(元)",
+		"alignment_column": "日期",
+	},
+	"cash_flow_per_share": {
+		"source_file": "stock_financial_analysis_indicator",
+		"column_name": "每股经营性现金流(元)",
+		"alignment_column": "日期",
+	},
+	"gross_profit_margin": {
+		"source_file": "stock_financial_analysis_indicator",
+		"column_name": "销售毛利率(%)",
+		"alignment_column": "日期",
+	},
+	
 }
 
 
@@ -205,6 +221,9 @@ def calculate_factors(metadata_df: pd.DataFrame, factors_dict: dict[str, list[st
 	for factor_name, field_names in factors_dict.items():
 		if factor_name == "fund_pe" and {"close", "eps"}.issubset(field_names):
 			out[factor_name] = np.where(out["eps"] != 0, out["close"] / out["eps"], np.nan)
+			out[factor_name] = out[factor_name].replace([np.inf, -np.inf], np.nan)
+		if factor_name == "fund_pb" and {"close", "bps"}.issubset(field_names):
+			out[factor_name] = np.where(out["bps"] != 0, out["close"] / out["bps"], np.nan)
 			out[factor_name] = out[factor_name].replace([np.inf, -np.inf], np.nan)
 	return out
 

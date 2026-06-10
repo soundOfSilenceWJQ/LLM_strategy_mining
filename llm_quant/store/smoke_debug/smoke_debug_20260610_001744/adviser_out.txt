@@ -1,0 +1,44 @@
+{
+  "source_record": {
+    "source_type": "news",
+    "section": "宏观",
+    "report_type": "",
+    "title": "政策支持科技创新",
+    "url": "https://example.com/news/1",
+    "publish_time": "2026-06-10",
+    "publish_date": "2026-06-10",
+    "org": "",
+    "analyst": ""
+  },
+  "analysis": {
+    "main_content": "监管层强调支持科技创新与产业升级，属政策支持类信息。",
+    "pricing_logic": "政策支持科技创新与产业升级，或利好相关科技产业，或提升相关资产估值预期。",
+    "market_impact": {
+      "direction": "中性偏多",
+      "target_assets": [
+        "科技创新相关行业"
+      ],
+      "horizon_days": 1,
+      "confidence": 0.2,
+      "reasoning": "政策支持表述宽泛，未明确具体方向，利好影响不确定。"
+    },
+    "investment_suggestion": {
+      "action": "观察",
+      "for_investor": "波段",
+      "holding_period_days": 1,
+      "position_guidance": "保持轻仓观望，不盲目参与未明确标的的炒作。",
+      "risk_controls": [
+        "避免盲目布局无明确细则的科技标的",
+        "控制单标的仓位不超5%"
+      ]
+    },
+    "risk_warnings": [
+      "政策支持未明确落地细则，利好可能不及预期",
+      "科技板块短期波动大，炒作风险较高"
+    ],
+    "evidence_quotes": [
+      "监管层强调支持科技创新与产业升级"
+    ]
+  },
+  "processed_at": "2026-06-10T00:15:43"
+}

@@ -1,0 +1,607 @@
+{
+  "adviser_out": {
+    "source_record": {
+      "source_type": "news",
+      "section": "宏观",
+      "report_type": "",
+      "title": "政策支持科技创新",
+      "url": "https://example.com/news/1",
+      "publish_time": "2026-06-09",
+      "publish_date": "2026-06-09",
+      "org": "",
+      "analyst": ""
+    },
+    "analysis": {
+      "main_content": "2026年6月9日发布的新闻显示，监管层明确强调支持科技创新与产业升级，信息表述简洁，未提及具体措施。",
+      "pricing_logic": "事件为监管层强调支持科技创新与产业升级，若后续出台具体支持细则，或传导至科技创新、产业升级相关板块；但当前信息不足，传导路径与力度不明确。",
+      "market_impact": {
+        "direction": "不确定",
+        "target_assets": [
+          "科技创新板块",
+          "产业升级相关行业"
+        ],
+        "horizon_days": 1,
+        "confidence": 0.2,
+        "reasoning": "仅提及监管层的方向性强调，未明确具体支持措施、力度等，无法判断对市场的实际影响，故影响不确定。"
+      },
+      "investment_suggestion": {
+        "action": "观察",
+        "for_investor": "短线",
+        "holding_period_days": 1,
+        "position_guidance": "保持观望，不盲目布局相关板块，避免因模糊政策信号冲动交易",
+        "risk_controls": [
+          "密切跟踪后续政策细则发布情况",
+          "控制仓位，避免参与非理性炒作的板块"
+        ]
+      },
+      "risk_warnings": [
+        "政策支持未明确具体落地措施，实际利好程度存在不确定性",
+        "市场可能对模糊政策信号产生非理性炒作，后续易出现回调风险"
+      ],
+      "evidence_quotes": [
+        "监管层强调支持科技创新与产业升级"
+      ]
+    },
+    "processed_at": "2026-06-09T23:37:24"
+  },
+  "parse_realtime_out": {
+    "source": {
+      "name": "测试源",
+      "publish_date": "2026-06-09",
+      "title": "测试标题",
+      "url": ""
+    },
+    "related_topics": [
+      "科技创新政策支持",
+      "行业景气度"
+    ],
+    "related_industries": [
+      "科技创新行业"
+    ],
+    "related_companies": [],
+    "core_viewpoints": [
+      "政策支持科技创新",
+      "科技创新相关行业景气度改善"
+    ],
+    "sentiment": "乐观",
+    "market_impact_chain": "政策支持科技创新 -> 提升科技创新相关行业景气度 -> 利好资本市场中科技创新类资产",
+    "key_metrics": [],
+    "uncertainties": [
+      "政策支持的具体落地效果存在不确定性",
+      "行业景气改善的持续性尚未明确"
+    ],
+    "assumptions": [
+      "政策支持措施能有效传导至科技创新领域",
+      "行业景气改善趋势可维持"
+    ],
+    "refined_summary": "政策支持科技创新，相关行业景气度改善，或利好资本市场中科技创新类资产",
+    "traceability": {
+      "evidence_quotes": [
+        "政策支持科技创新，行业景气改善"
+      ]
+    },
+    "processed_at": "2026-06-09T23:37:33"
+  },
+  "summary_out": {
+    "date": "2026-06-09",
+    "counts": {
+      "items": 1,
+      "news": 1,
+      "reports": 0
+    },
+    "summary": {
+      "market_overview": "2026年6月9日，市场仅出现监管层强调支持科技创新与产业升级的政策类新闻，无相关研报发布，政策表述简洁未提及具体落地措施，整体信息面信号模糊。",
+      "dominant_themes": [
+        "科技创新板块",
+        "产业升级相关行业"
+      ],
+      "pricing_logic_summary": "当天核心定价逻辑为监管层明确表态支持科技创新与产业升级，但因缺乏具体落地细则，政策传导路径与力度尚不明确，对相关板块的影响存在不确定性。",
+      "bullish_signals": [
+        "监管层明确表态支持科技创新与产业升级"
+      ],
+      "bearish_signals": [
+        "政策表述缺乏具体落地措施，传导力度与路径不明"
+      ],
+      "investor_advice": {
+        "stance": "偏谨慎",
+        "short_term": "短线保持观望，不盲目布局相关板块",
+        "swing_term": "波段操作需等待政策细则明确后再考虑介入",
+        "risk_controls": [
+          "避免因模糊政策信号冲动交易",
+          "控制相关板块的持仓规模"
+        ]
+      },
+      "watch_list": [
+        "科技创新板块的后续政策细则",
+        "产业升级相关行业的落地措施"
+      ],
+      "uncertainties": [
+        "政策支持的具体措施未明确，传导路径与力度不确定",
+        "当前政策信号模糊，对相关板块的实际影响尚不清晰"
+      ]
+    },
+    "processed_at": "2026-06-09T23:37:42"
+  },
+  "factor_out": {
+    "name": "EPS_Consensus_30D_Revision",
+    "category": "fundamental",
+    "expression": "DELTA(EPS_CONSENSUS, 30) / DELAY(EPS_CONSENSUS, 30)",
+    "logic": "EPS一致预期的30日修正幅度反映市场对公司盈利预期的调整力度，幅度越大说明机构对公司盈利的上修信心越强，预示公司未来盈利改善概率越高，进而驱动股价获得超额收益",
+    "source_insight": "锚定学术文献中盈利预期修正因子与未来超额收益正相关的核心结论，适配中证500样本，结合政策支持科技领域的盈利预期调整逻辑（参考用户提供的政策支持科技投资逻辑）",
+    "risk_warnings": "1. 若样本股票的EPS一致预期数据缺失或一致性低，因子信号有效性下降；2. 极端市场环境（如股灾、泡沫牛市）下，盈利预期的参考价值减弱；3. 短期突发事件可能导致预期修正出现异常值，干扰因子表现",
+    "code": "def compute_factor(df):\n    import pandas as pd\n    import numpy as np\n    # 获取EPS一致预期列，兼容大小写\n    eps = df['EPS_CONSENSUS'] if 'EPS_CONSENSUS' in df.columns else df['eps_consensus']\n    # 确保有足够的数据点（至少31个，避免未来数据）\n    if len(eps) < 31:\n        return np.nan\n    # 计算30日修正幅度：(最新EPS - 30日前EPS)/30日前EPS\n    factor = (eps.iloc[-1] - eps.iloc[-31]) / eps.iloc[-31]\n    return factor",
+    "metadata": {
+      "economic_attribution": "因子收益来源于市场对公司盈利预期的调整，预期上修幅度越大，反映机构对公司盈利改善的信心越强，未来盈利超预期的概率越高，进而推动股价产生超额收益",
+      "applicable_market_environment": [
+        "正常市场环境",
+        "中期趋势明确的市场环境",
+        "政策支持的科技领域市场环境"
+      ],
+      "literature_source": "学术文献中盈利预期修正因子的核心研究，适配中证500样本的盈利预期数据",
+      "factor_type": "fundamental",
+      "rebalance_cycle": "日频",
+      "data_requirements": [
+        "EPS一致预期（EPS_CONSENSUS）"
+      ]
+    },
+    "directional_constraint": {
+      "higher_is_better": true,
+      "original_direction": "positive",
+      "transformation": "none",
+      "note": "无"
+    },
+    "source_query": "A股市场当前有效的超额收益来源",
+    "source_meta": {
+      "literature_source": "test-paper",
+      "rebalance_cycle": "月频"
+    },
+    "conversation_history": [],
+    "created_at": "2026-06-09T23:38:09"
+  },
+  "repaired_out": {
+    "name": "EPS_Consensus_30D_Revision",
+    "category": "fundamental",
+    "expression": "DELTA(EPS_CONSENSUS, 30) / DELAY(EPS_CONSENSUS, 30)",
+    "logic": "EPS一致预期的30日修正幅度反映市场对公司盈利预期的调整力度，幅度越大说明机构对公司盈利的上修信心越强，预示公司未来盈利改善概率越高，进而驱动股价获得超额收益",
+    "source_insight": "锚定学术文献中盈利预期修正因子与未来超额收益正相关的核心结论，适配中证500样本，结合政策支持科技领域的盈利预期调整逻辑（参考用户提供的政策支持科技投资逻辑）",
+    "risk_warnings": "1. 若样本股票的EPS一致预期数据缺失或一致性低，因子信号有效性下降；2. 极端市场环境（如股灾、泡沫牛市）下，盈利预期的参考价值减弱；3. 短期突发事件可能导致预期修正出现异常值，干扰因子表现",
+    "code": "def compute_factor(df):\n    import pandas as pd\n    import numpy as np\n    # 检查所需字段是否存在，兼容大小写\n    col_name = 'EPS_CONSENSUS' if 'EPS_CONSENSUS' in df.columns else 'eps_consensus' if 'eps_consensus' in df.columns else None\n    if col_name is None:\n        return np.nan\n    eps = df[col_name]\n    # 确保数据按时间升序排列，避免未来数据依赖\n    df_sorted = df.sort_index(ascending=True)\n    eps_sorted = df_sorted[col_name]\n    # 计算30日修正幅度，使用shift确保无未来函数，且需至少31个数据点\n    if len(eps_sorted) < 31:\n        return np.nan\n    eps_current = eps_sorted.iloc[-1]\n    eps_prev30 = eps_sorted.shift(30).iloc[-1]\n    # 处理分母为0或缺失值的异常情况\n    if pd.isna(eps_current) or pd.isna(eps_prev30) or eps_prev30 == 0:\n        return np.nan\n    factor = (eps_current - eps_prev30) / eps_prev30\n    return factor",
+    "metadata": {
+      "economic_attribution": "因子收益来源于市场对公司盈利预期的调整，预期上修幅度越大，反映机构对公司盈利改善的信心越强，未来盈利超预期的概率越高，进而推动股价产生超额收益",
+      "applicable_market_environment": [
+        "正常市场环境",
+        "中期趋势明确的市场环境",
+        "政策支持的科技领域市场环境"
+      ],
+      "literature_source": "学术文献中盈利预期修正因子的核心研究，适配中证500样本的盈利预期数据",
+      "factor_type": "fundamental",
+      "rebalance_cycle": "日频",
+      "data_requirements": [
+        "EPS一致预期（EPS_CONSENSUS）"
+      ]
+    },
+    "directional_constraint": {
+      "higher_is_better": true,
+      "original_direction": "positive",
+      "transformation": "none",
+      "note": "无"
+    },
+    "source_query": "A股市场当前有效的超额收益来源",
+    "source_meta": {
+      "literature_source": "test-paper",
+      "rebalance_cycle": "月频"
+    },
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "之前公式运行失败"
+      },
+      {
+        "role": "assistant",
+        "content": "建议检查字段名和时序方向"
+      }
+    ],
+    "created_at": "2026-06-09T23:38:33",
+    "repair_log": [
+      {
+        "timestamp": "2026-06-09T23:38:33",
+        "error_info": "NameError: eps not defined",
+        "correct_advice": "改为使用可用字段并去除未来函数"
+      }
+    ]
+  },
+  "selector_out": {
+    "date": "2026-06-09",
+    "recommendation": {
+      "market_analysis": {
+        "current_regime": "2026年6月9日，A股市场处于震荡格局，成长风格板块表现偏强，市场缺乏明确趋势性行情，资金偏好具备盈利确定性的成长标的",
+        "dominant_factors": [
+          "成长风格因子",
+          "盈利预期修正因子",
+          "短期动量因子"
+        ],
+        "risk_factors": [
+          "风格轮动风险",
+          "盈利预期不及预期风险",
+          "震荡市情绪波动风险"
+        ],
+        "macroeconomic_outlook": "当前宏观经济处于弱复苏阶段，政策对科创、新能源等成长赛道支持力度较大，流动性维持合理充裕，成长风格具备基本面支撑"
+      },
+      "recommended_factors": [
+        {
+          "factor_name": "eps_revision_30d",
+          "rationale": "当前成长风格偏强，市场资金高度关注成长股的盈利预期变化，30日盈利预期修正因子能捕捉机构资金对成长标的的盈利上调信号，在震荡市中，盈利确定性强的成长股更易获得资金青睐",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "在成长风格偏强的震荡市中，预计能贡献稳定的超额收益，年化超额约4%-6%",
+          "weight": 0.2,
+          "risk_level": "中"
+        },
+        {
+          "factor_name": "momentum_20d",
+          "rationale": "震荡市中趋势性行情虽弱，但短期动量（20日）能反映资金的短期偏好，成长股的短期动量在风格偏强时具有持续性，适合震荡市的波段操作，能有效捕捉成长板块的短期上涨行情",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "在成长风格主导的震荡市中，预计能贡献3%-5%的年化超额收益",
+          "weight": 0.18,
+          "risk_level": "中"
+        },
+        {
+          "factor_name": "growth_factor",
+          "rationale": "当前市场成长风格偏强，成长因子能直接筛选出具备高盈利增速的标的，契合市场风格偏好，在震荡市中，成长股的弹性优于价值股，能获取风格溢价收益",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "预计能贡献4%-7%的年化超额收益",
+          "weight": 0.17,
+          "risk_level": "中"
+        },
+        {
+          "factor_name": "quality_factor",
+          "rationale": "震荡市中，具备稳定盈利质量的成长股更能抵御市场波动，质量因子（如ROE、毛利率稳定性）能筛选出基本面扎实的成长标的，降低组合回撤风险，契合当前市场对确定性的需求",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "预计能贡献2%-4%的年化超额收益，同时降低组合波动",
+          "weight": 0.15,
+          "risk_level": "低"
+        },
+        {
+          "factor_name": "volume_momentum",
+          "rationale": "震荡市中单纯价格动量易受短期情绪干扰，量能动量（价格+成交量）能确认资金的真实流入，避免伪动量标的，在成长风格偏强时，量价配合的动量信号更可靠，能提升组合的胜率",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "预计能贡献3%-5%的年化超额收益",
+          "weight": 0.15,
+          "risk_level": "中"
+        },
+        {
+          "factor_name": "sector_exposure_growth",
+          "rationale": "当前成长风格偏强，超配成长板块（如科创50、新能源、半导体等）的标的能直接受益于风格行情，在震荡市中，板块风格的收益贡献远大于个股选择，能快速捕捉成长板块的行情红利",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无历史表现数据",
+          "expected_performance": "预计能贡献5%-8%的年化超额收益",
+          "weight": 0.15,
+          "risk_level": "中"
+        }
+      ],
+      "portfolio_composition": {
+        "total_weight": 1.0,
+        "concentration": "中等集中度，核心配置成长风格相关因子，权重集中在盈利预期修正、动量和成长因子",
+        "diversification": "中等分散化，覆盖基本面、动量、风格暴露等维度，降低单一因子失效风险"
+      },
+      "factors_to_avoid": [
+        {
+          "factor_name": "value_factor",
+          "reason": "当前市场成长风格偏强，价值因子的收益贡献显著弱于成长因子，配置价值因子可能跑输大盘，难以捕捉市场行情红利"
+        },
+        {
+          "factor_name": "low_volatility_factor",
+          "reason": "震荡市中，成长风格的低波动标的通常缺乏弹性，无法充分享受成长行情的上涨收益，表现弱于动量类和盈利类因子"
+        }
+      ],
+      "implementation_suggestions": {
+        "rebalance_frequency": "月度调整",
+        "entry_timing": "当前市场处于震荡格局，可在市场情绪平稳、成长板块估值处于合理区间时分批建仓，避免追高",
+        "exit_signals": [
+          "成长风格指数（如科创50）连续3个交易日跑输沪深300价值指数",
+          "盈利预期修正因子的月度IC值连续2个月为负",
+          "市场隐含波动率（VIX）突破25且维持3个交易日以上"
+        ],
+        "monitoring_metrics": [
+          "成长风格相对强弱指数",
+          "盈利预期修正因子IC值",
+          "20日动量因子IC值",
+          "市场隐含波动率（VIX）"
+        ]
+      },
+      "confidence_level": "中",
+      "uncertainty_sources": [
+        "市场风格轮动的不确定性",
+        "宏观政策调整的不确定性",
+        "盈利预期修正的不及预期风险",
+        "震荡市中资金情绪的快速变化"
+      ],
+      "next_review_date": "2026-07-09"
+    },
+    "processed_at": "2026-06-09T23:39:05"
+  },
+  "text_proc_out": {
+    "source_type": "news",
+    "section": "宏观",
+    "title": "政策支持科技创新",
+    "publish_time": "2026-06-09",
+    "url": "https://example.com/news/1",
+    "content": "监管层强调支持科技创新与产业升级。",
+    "source": "测试源",
+    "date": "2026-06-09",
+    "summary": "2026年6月9日，测试源发布题为《政策支持科技创新》的新闻，核心内容为监管层强调支持科技创新与产业升级。该信息未披露具体落地细则、支持力度等细节，无相关量化数据指标。",
+    "logic": "监管层强调支持科技创新与产业升级 -> 相关科创企业获得政策导向支持 -> 科创类资产、产业升级相关领域资产或受积极影响",
+    "key_drivers": [
+      "监管层强调支持科技创新与产业升级"
+    ],
+    "affected_sectors": [
+      "科技创新行业",
+      "产业升级相关行业"
+    ],
+    "pricing_factors": [
+      "政策支持",
+      "科技创新",
+      "产业升级"
+    ],
+    "time_horizon": "未知",
+    "sentiment": "neutral",
+    "tags": [
+      "政策支持",
+      "科技创新",
+      "产业升级",
+      "科技创新行业",
+      "产业升级相关行业"
+    ],
+    "risk_warnings": "政策支持的具体落地细则尚未明确；政策支持的力度、覆盖范围等细节未公开",
+    "source_meta": {
+      "name": "测试源",
+      "publish_date": "2026-06-09",
+      "title": "政策支持科技创新",
+      "url": "https://example.com/news/1"
+    },
+    "market_impact_chain": "监管层强调支持科技创新与产业升级 -> 相关科创企业获得政策导向支持 -> 科创类资产、产业升级相关领域资产或受积极影响",
+    "uncertainties": [
+      "政策支持的具体落地细则尚未明确",
+      "政策支持的力度、覆盖范围等细节未公开"
+    ],
+    "assumptions": [
+      "监管层的政策导向将有效传导至相关产业主体",
+      "相关产业主体能及时对接并享受政策支持"
+    ],
+    "core_viewpoints": [
+      "监管层强调支持科技创新与产业升级"
+    ],
+    "key_metrics": [],
+    "traceability": {
+      "evidence_quotes": [
+        "监管层强调支持科技创新与产业升级"
+      ]
+    },
+    "processing_mode": "realtime"
+  },
+  "integrated_out": {
+    "date": "2026-06-09",
+    "counts": {
+      "raw_records": 1,
+      "analyzed_rows": 1,
+      "factors": 1
+    },
+    "analyzed_rows": [
+      {
+        "source_record": {
+          "source_type": "news",
+          "section": "宏观",
+          "report_type": "",
+          "title": "政策支持科技创新",
+          "url": "https://example.com/news/1",
+          "publish_time": "2026-06-09",
+          "publish_date": "2026-06-09",
+          "org": "",
+          "analyst": ""
+        },
+        "analysis": {
+          "main_content": "2026年6月9日新闻显示，监管层强调支持科技创新与产业升级，为政策类利好信息，但内容较笼统。",
+          "pricing_logic": "事件为监管层明确支持科技创新与产业升级，传导路径为政策利好引导资金关注相关板块，可能影响科技创新、产业升级相关的股票及板块资产。",
+          "market_impact": {
+            "direction": "中性偏多",
+            "target_assets": [
+              "科技创新板块",
+              "产业升级相关板块"
+            ],
+            "horizon_days": 1,
+            "confidence": 0.2,
+            "reasoning": "政策明确支持方向但无具体落地措施，市场反应缺乏明确指引，影响偏模糊，故判断为中性偏多。"
+          },
+          "investment_suggestion": {
+            "action": "观察",
+            "for_investor": "短线",
+            "holding_period_days": 1,
+            "position_guidance": "保持轻仓观望，不盲目参与相关板块炒作，待政策细则明确后再决策。",
+            "risk_controls": [
+              "控制相关板块持仓占比不超过总仓位3%",
+              "每日跟踪政策后续发布动态"
+            ]
+          },
+          "risk_warnings": [
+            "政策落地细则不及预期风险",
+            "相关板块估值波动引发的投资风险"
+          ],
+          "evidence_quotes": [
+            "监管层强调支持科技创新与产业升级"
+          ]
+        },
+        "processed_at": "2026-06-09T23:39:26"
+      }
+    ],
+    "daily_summary": {
+      "date": "2026-06-09",
+      "counts": {
+        "items": 1,
+        "news": 1,
+        "reports": 0
+      },
+      "summary": {
+        "market_overview": "2026年6月9日市场信息面仅1条政策类新闻，监管层明确表态支持科技创新与产业升级，但内容较笼统，无配套研报，整体信息偏单一，以中性偏多的政策信号为主。",
+        "dominant_themes": [
+          "科技创新板块",
+          "产业升级相关板块"
+        ],
+        "pricing_logic_summary": "当天核心定价逻辑为监管层发布支持科技创新与产业升级的笼统政策，引导市场资金关注相关板块，但因政策缺乏细则，资金关注度有限，定价呈中性偏多特征。",
+        "bullish_signals": [
+          "监管层明确表态支持科技创新与产业升级的政策类利好"
+        ],
+        "bearish_signals": [],
+        "investor_advice": {
+          "stance": "偏谨慎",
+          "short_term": "短线保持轻仓观望，不盲目参与相关板块炒作",
+          "swing_term": "波段操作等待政策细则明确后再决策",
+          "risk_controls": [
+            "控制仓位，避免盲目追高",
+            "不参与无明确政策支撑的板块炒作"
+          ]
+        },
+        "watch_list": [
+          "科技创新板块的政策落地细则",
+          "产业升级相关板块的具体支持措施"
+        ],
+        "uncertainties": [
+          "政策支持内容笼统，缺乏具体落地细则",
+          "市场对该政策的资金关注度及持续性尚未明确"
+        ]
+      },
+      "processed_at": "2026-06-09T23:39:36"
+    },
+    "factor_selection": {
+      "date": "2026-06-09",
+      "recommendation": {
+        "market_analysis": {
+          "current_regime": "当前市场处于政策驱动的科技创新与产业升级主题行情，监管层表态支持科技成长方向，政策信号中性偏多，市场风格偏向成长板块",
+          "dominant_factors": [
+            "科技创新主题因子",
+            "盈利预期修正因子"
+          ],
+          "risk_factors": [
+            "政策落地不及预期风险",
+            "科技板块估值偏高风险",
+            "盈利预期修正的虚假信号风险"
+          ],
+          "macroeconomic_outlook": "宏观层面处于经济结构转型阶段，政策明确支持科技创新与产业升级，成长板块具备长期政策红利预期，短期受政策信号驱动存在交易性机会"
+        },
+        "recommended_factors": [
+          {
+            "factor_name": "eps_revision_30d",
+            "rationale": "当前政策支持科技创新，市场资金优先关注盈利预期改善的成长个股，30天内盈利预期向上修正的公司，业绩兑现概率更高，在政策利好环境下更易获得超额收益",
+            "historical_ic": 0.04,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在政策驱动的成长行情中获得正向超额收益",
+            "weight": 0.15,
+            "risk_level": "中"
+          },
+          {
+            "factor_name": "rd_to_asset",
+            "rationale": "政策支持产业升级，研发投入是科技公司成长核心驱动力，研发投入占总资产比例高的公司符合政策导向，未来成长空间更大，更受市场青睐",
+            "historical_ic": 0.05,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在产业升级主题行情中获得正向收益",
+            "weight": 0.15,
+            "risk_level": "低"
+          },
+          {
+            "factor_name": "revenue_growth_12m",
+            "rationale": "科技公司核心成长指标为营收增长，政策利好下，营收高增长的公司具备更强竞争力和业绩弹性，易吸引资金流入",
+            "historical_ic": 0.045,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在成长风格行情中获得超额收益",
+            "weight": 0.15,
+            "risk_level": "中"
+          },
+          {
+            "factor_name": "peg_ratio",
+            "rationale": "科技股估值需结合盈利增长水平，PEG合理的个股估值性价比更高，在政策利好的成长板块中，这类个股更易被资金配置",
+            "historical_ic": 0.038,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在成长板块中获得稳定收益",
+            "weight": 0.12,
+            "risk_level": "中"
+          },
+          {
+            "factor_name": "volume_change_20d",
+            "rationale": "政策利好科技创新板块，资金流入会带来成交量持续放大，20天内成交量显著放大的个股具备短期趋势性机会，适合当前政策驱动的交易性行情",
+            "historical_ic": 0.042,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在短期交易性行情中获得收益",
+            "weight": 0.12,
+            "risk_level": "中"
+          },
+          {
+            "factor_name": "star50_component",
+            "rationale": "科创50成分股直接对应监管层支持的科技创新核心板块，政策利好对成分股的业绩和估值提振更直接，是当前政策驱动行情的核心标的池",
+            "historical_ic": 0.055,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期在科创主题行情中获得超额收益",
+            "weight": 0.12,
+            "risk_level": "低"
+          },
+          {
+            "factor_name": "accruals_ratio",
+            "rationale": "盈利预期修正的有效性依赖于盈利质量，应计项目占比低的公司盈利真实性更高，可避免会计操纵带来的预期修正陷阱，降低组合风险",
+            "historical_ic": 0.035,
+            "recent_performance": "暂无公开近期表现数据",
+            "expected_performance": "预期提升组合盈利质量，降低回撤风险",
+            "weight": 0.11,
+            "risk_level": "低"
+          }
+        ],
+        "portfolio_composition": {
+          "total_weight": 1.0,
+          "concentration": "权重分布较为均衡，前三个核心因子各占0.15，其余因子权重在0.11-0.12之间，集中度适中，避免单一因子过度暴露风险",
+          "diversification": "覆盖盈利预期、研发投入、成长能力、估值、流动性、行业属性、盈利质量7个维度，分散化程度较高，能有效对冲单一因子失效风险"
+        },
+        "factors_to_avoid": [
+          {
+            "factor_name": "cyclical_beta",
+            "reason": "当前政策偏向科技创新成长板块，周期股受政策利好影响较小，且盈利波动大，不符合市场风格，应回避"
+          },
+          {
+            "factor_name": "eps_revision_neg_30d",
+            "reason": "政策利好成长板块，市场资金会回避盈利预期向下修正的个股，这类个股在当前环境下表现弱于市场，应回避"
+          },
+          {
+            "factor_name": "high_debt_ratio",
+            "reason": "科技成长公司通常需轻资产运营，高负债公司财务压力大，政策利好下成长空间受限，应回避"
+          }
+        ],
+        "implementation_suggestions": {
+          "rebalance_frequency": "月度调整，每月末根据最新因子数据调整组合权重",
+          "entry_timing": "当前2026年6月9日，政策刚发布，可逐步建仓科创50成分股中满足eps向上修正、研发投入高、营收增长快的个股，建仓周期控制在1-2周",
+          "exit_signals": [
+            "科创50指数回撤幅度超过5%",
+            "个股30天内eps预期向下修正超过10%",
+            "监管层政策表态转向不再支持科技创新与产业升级",
+            "个股所属行业出现重大利空事件"
+          ],
+          "monitoring_metrics": [
+            "科创50指数涨跌幅",
+            "个股30天eps预期变化率",
+            "研发投入同比增速",
+            "政策落地进度（如配套措施发布情况）",
+            "市场成交量变化"
+          ]
+        },
+        "confidence_level": "中",
+        "uncertainty_sources": [
+          "政策落地的具体力度和时间节点，若缺乏配套措施，利好效应可能减弱",
+          "科技创新板块的盈利兑现情况，若后续业绩不及预期，成长因子表现会下滑",
+          "市场资金对科技股的配置意愿，若资金流入不足，流动性因子有效性会降低"
+        ],
+        "next_review_date": "2026-07-09"
+      },
+      "processed_at": "2026-06-09T23:40:14"
+    },
+    "processed_at": "2026-06-09T23:40:14"
+  }
+}

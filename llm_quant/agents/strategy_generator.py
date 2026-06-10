@@ -1,52 +1,28 @@
 """
 第3层：策略生成层（Strategy Generation Layer）
 功能：
-  - RAG：从信息库检索与当前市场环境相关的信息
-  - 调用LLM生成标准化阿尔法因子（公式 + Python代码）
-  - 保证因子的经济逻辑与代码可执行性
+    - 将文献/研报中的因子定义复现为可执行代码
+    - 生成标准化元数据，保证可解释与可追溯
+    - 在因子出错时结合历史对话进行增量修复
 """
 
 from __future__ import annotations
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from llm_quant.utils.llm_client import LLMClient
 from llm_quant.data.info_store import InfoStore
 from llm_quant.config import ALLOWED_OPERATORS, RAG_TOP_K
-
-_SYSTEM_PROMPT = """你是一名顶级量化投资研究员，专注于A股市场Alpha因子挖掘。
-你需要根据提供的市场信息和投资逻辑，生成具有严谨经济学含义的可执行Alpha因子。
-因子代码必须符合规定的算子体系，不能引入未来数据。
-输出必须是有效的JSON格式。"""
-
-_FACTOR_GENERATION_PROMPT = """请根据以下市场信息，生成一个新的Alpha因子。
-
-【参考信息（来自最新市场研究）】
-{context}
-
-【生成要求】
-1. 因子必须基于以下标准数据列：CLOSE, OPEN, HIGH, LOW, VOLUME, VWAP
-2. 可用算子：{operators}
-3. 因子必须有清晰的经济逻辑，不得含有未来函数
-4. 因子类别从以下选择：momentum, reversal, volatility, fundamental, liquidity, value, quality, growth, technical
-
-【Python代码规范】
-代码接受参数：df（DataFrame，含CLOSE/OPEN/HIGH/LOW/VOLUME列，日期为索引，股票代码为列名）
-返回：pd.Series（因子值，index为股票代码）
-使用pandas/numpy，不得import其他库。
-
-请严格按以下JSON格式输出：
-{{
-  "name": "因子名称（英文，如: momentum_14d）",
-  "category": "因子类别",
-  "expression": "因子表达式（数学公式或简洁描述，如：14日价格动量 = CLOSE - DELAY(CLOSE, 14)）",
-  "logic": "经济学逻辑说明（100-200字）",
-  "source_insight": "来源于哪条信息/研究（简述）",
-  "risk_warnings": "潜在风险（50字）",
-  "code": "def compute_factor(df):\\n    import pandas as pd\\n    import numpy as np\\n    # 计算因子值\\n    close = df['close'] if 'close' in df.columns else df['CLOSE']\\n    factor = ...\\n    return factor.iloc[-1]  # 返回最新截面因子值"
-}}"""
+from llm_quant.prompts import (
+        DEFAULT_PLATFORM_SPEC,
+        FACTOR_GENERATOR_SYSTEM_PROMPT,
+        render_factor_generation_prompt,
+        render_factor_repair_prompt,
+)
 
 
 class StrategyGenerator:
@@ -59,6 +35,88 @@ class StrategyGenerator:
         self.llm = llm or LLMClient()
         self.info_store = info_store or InfoStore()
 
+    def generate_factor_from_literature(
+        self,
+        factor_description: str,
+        economic_logic: str,
+        other_info: str = "",
+        platform_spec: str = "",
+        source_meta: dict[str, Any] | None = None,
+        conversation_history: list[dict[str, str]] | None = None,
+        query: str = "A股市场当前有效的超额收益来源",
+        n_context: int = RAG_TOP_K,
+    ) -> dict | None:
+        """按文献描述复现单个因子，并绑定标准化元数据。"""
+        source_meta = source_meta or {}
+        context = self._build_rag_context(query=query, n_context=n_context)
+        history_context = self._format_history(conversation_history)
+        merged_other_info = (other_info or "").strip()
+        if history_context:
+            merged_other_info = (merged_other_info + "\n\n历史对话摘要:\n" + history_context).strip()
+
+        prompt = render_factor_generation_prompt(
+            factor_description=(factor_description or "").strip(),
+            economic_logic=(economic_logic or "").strip(),
+            other_info=merged_other_info,
+            platform_spec=(platform_spec or DEFAULT_PLATFORM_SPEC).strip(),
+            operators=", ".join(ALLOWED_OPERATORS),
+            context=context[:3000],
+        )
+
+        try:
+            response = self.llm.chat(user_message=prompt, system_prompt=FACTOR_GENERATOR_SYSTEM_PROMPT)
+            factor = self._parse_json(response)
+            factor = self._normalize_factor_output(
+                factor=factor,
+                source_meta=source_meta,
+                source_query=query,
+                conversation_history=conversation_history,
+            )
+            print(f"[Layer3] 文献复现因子：{factor.get('name','unknown')} ({factor.get('category','')})")
+            return factor
+        except Exception as e:
+            print(f"[Layer3] 因子复现失败: {e}")
+            return None
+
+    def repair_factor_with_history(
+        self,
+        current_factor: dict[str, Any],
+        error_info: str,
+        correct_advice: str,
+        conversation_history: list[dict[str, str]] | None = None,
+    ) -> dict | None:
+        """结合历史对话对错误因子进行增量修复。"""
+        history_context = self._format_history(conversation_history)
+        prompt = render_factor_repair_prompt(
+            error_info=(error_info or "").strip(),
+            correct_advice=(correct_advice or "").strip(),
+            current_factor_json=json.dumps(current_factor, ensure_ascii=False, indent=2),
+            history_context=history_context or "（无）",
+        )
+
+        try:
+            response = self.llm.chat(user_message=prompt, system_prompt=FACTOR_GENERATOR_SYSTEM_PROMPT)
+            fixed = self._parse_json(response)
+            fixed = self._normalize_factor_output(
+                factor=fixed,
+                source_meta=current_factor.get("source_meta", {}),
+                source_query=current_factor.get("source_query", ""),
+                conversation_history=conversation_history,
+            )
+            repair_log = list(current_factor.get("repair_log", []))
+            repair_log.append(
+                {
+                    "timestamp": datetime.now().isoformat(timespec="seconds"),
+                    "error_info": error_info,
+                    "correct_advice": correct_advice,
+                }
+            )
+            fixed["repair_log"] = repair_log
+            return fixed
+        except Exception as e:
+            print(f"[Layer3] 因子修复失败: {e}")
+            return None
+
     def generate_factor(
         self,
         query: str = "A股市场当前有效的超额收益来源",
@@ -70,37 +128,14 @@ class StrategyGenerator:
         2. 构建 context
         3. LLM生成因子
         """
-        # Step 1: RAG 检索
-        related_records = self.info_store.search(query, top_k=n_context)
-        if not related_records:
-            print("[Layer3] 信息库为空，使用通用知识生成因子...")
-            context = "（暂无实时信息，基于通用金融市场知识）"
-        else:
-            context = "\n\n".join([
-                f"[{i+1}] 标题：{r.get('title','')}\n"
-                f"  投资逻辑：{r.get('logic','') or r.get('summary','')}\n"
-                f"  关键驱动：{', '.join(r.get('key_drivers',[]))}\n"
-                f"  时效：{r.get('time_horizon','')}"
-                for i, r in enumerate(related_records)
-            ])
-
-        # Step 2: 构建 prompt
-        prompt = _FACTOR_GENERATION_PROMPT.format(
-            context=context[:3000],
-            operators=", ".join(ALLOWED_OPERATORS),
+        # 兼容旧接口：基于检索上下文生成“通用模板”因子。
+        return self.generate_factor_from_literature(
+            factor_description="基于近期市场信息提炼可复现因子定义",
+            economic_logic="围绕可验证的风险补偿与行为偏差路径构建因子",
+            other_info="由系统自动检索上下文辅助复现。",
+            query=query,
+            n_context=n_context,
         )
-
-        # Step 3: LLM 生成
-        try:
-            response  = self.llm.chat(user_message=prompt, system_prompt=_SYSTEM_PROMPT)
-            factor    = self._parse_json(response)
-            factor["source_query"]   = query
-            factor["context_records"] = [r.get("id","") for r in related_records]
-            print(f"[Layer3] 生成因子：{factor.get('name','unknown')} ({factor.get('category','')})")
-            return factor
-        except Exception as e:
-            print(f"[Layer3] 因子生成失败: {e}")
-            return None
 
     def generate_batch(
         self,
@@ -127,6 +162,25 @@ class StrategyGenerator:
                 factors.append(f)
         return factors
 
+    def generate_batch_from_literature(self, factors_input: list[dict[str, Any]]) -> list[dict]:
+        """批量按文献字段复现因子。"""
+        out: list[dict] = []
+        for i, item in enumerate(factors_input):
+            print(f"\n[Layer3] 文献复现 {i+1}/{len(factors_input)}")
+            fac = self.generate_factor_from_literature(
+                factor_description=str(item.get("factor_description", "")),
+                economic_logic=str(item.get("economic_logic", "")),
+                other_info=str(item.get("other_info", "")),
+                platform_spec=str(item.get("platform_spec", "")),
+                source_meta=item.get("source_meta", {}),
+                conversation_history=item.get("conversation_history", []),
+                query=str(item.get("query", "A股市场当前有效的超额收益来源")),
+                n_context=int(item.get("n_context", RAG_TOP_K)),
+            )
+            if fac:
+                out.append(fac)
+        return out
+
     # ── 辅助：JSON 解析容错 ───────────────────────────────
     @staticmethod
     def _parse_json(text: str) -> dict:
@@ -139,3 +193,92 @@ class StrategyGenerator:
         if start != -1 and end != -1:
             text = text[start:end+1]
         return json.loads(text)
+
+    def _build_rag_context(self, query: str, n_context: int) -> str:
+        related_records = self.info_store.search(query, top_k=n_context)
+        if not related_records:
+            return "（暂无实时信息，基于通用金融市场知识）"
+        return "\n\n".join(
+            [
+                f"[{i+1}] 标题：{r.get('title','')}\n"
+                f"  投资逻辑：{r.get('logic','') or r.get('summary','')}\n"
+                f"  关键驱动：{', '.join(r.get('key_drivers',[]))}\n"
+                f"  时效：{r.get('time_horizon','')}"
+                for i, r in enumerate(related_records)
+            ]
+        )
+
+    @staticmethod
+    def _format_history(conversation_history: list[dict[str, str]] | None) -> str:
+        if not conversation_history:
+            return ""
+        lines: list[str] = []
+        for i, msg in enumerate(conversation_history, start=1):
+            role = str(msg.get("role", "user"))
+            content = str(msg.get("content", "")).strip()
+            if not content:
+                continue
+            lines.append(f"[{i}] {role}: {content}")
+        return "\n".join(lines)
+
+    def _normalize_factor_output(
+        self,
+        factor: dict[str, Any],
+        source_meta: dict[str, Any],
+        source_query: str,
+        conversation_history: list[dict[str, str]] | None,
+    ) -> dict[str, Any]:
+        factor.setdefault("name", "unnamed_factor")
+        factor.setdefault("category", "fundamental")
+        factor.setdefault("expression", "")
+        factor.setdefault("logic", "")
+        factor.setdefault("source_insight", "")
+        factor.setdefault("risk_warnings", "")
+        factor.setdefault("code", "")
+
+        metadata = factor.get("metadata", {}) if isinstance(factor.get("metadata", {}), dict) else {}
+        metadata.setdefault("economic_attribution", "")
+        metadata.setdefault("applicable_market_environment", [])
+        metadata.setdefault("literature_source", source_meta.get("literature_source", ""))
+        metadata.setdefault("factor_type", factor.get("category", ""))
+        metadata.setdefault("rebalance_cycle", source_meta.get("rebalance_cycle", "日频"))
+        metadata.setdefault("data_requirements", ["CLOSE", "OPEN", "HIGH", "LOW", "VOLUME", "VWAP"])
+        factor["metadata"] = metadata
+
+        directional = factor.get("directional_constraint", {})
+        if not isinstance(directional, dict):
+            directional = {}
+        directional.setdefault("higher_is_better", True)
+        directional.setdefault("original_direction", "unknown")
+        directional.setdefault("transformation", "none")
+        directional.setdefault("note", "")
+
+        transform = str(directional.get("transformation", "none")).strip().lower()
+        if transform not in {"none", "negate"}:
+            transform = "none"
+            directional["transformation"] = "none"
+
+        if transform == "negate":
+            factor["code"] = self._insert_negate_before_return(str(factor.get("code", "")))
+            if not directional.get("note"):
+                directional["note"] = "该因子原始方向为反向，已按约束进行取负转化。"
+
+        factor["directional_constraint"] = directional
+        factor["source_query"] = source_query
+        factor["source_meta"] = source_meta
+        factor["conversation_history"] = conversation_history or []
+        factor["created_at"] = datetime.now().isoformat(timespec="seconds")
+        return factor
+
+    @staticmethod
+    def _insert_negate_before_return(code: str) -> str:
+        lines = code.splitlines()
+        for i, line in enumerate(lines):
+            stripped = line.lstrip()
+            if stripped.startswith("return "):
+                indent = line[: len(line) - len(stripped)]
+                if i > 0 and lines[i - 1].strip() == "factor = -factor":
+                    return code
+                lines.insert(i, f"{indent}factor = -factor")
+                return "\n".join(lines)
+        return code

@@ -1,0 +1,5 @@
+2024-06-09,am,HTTPError: 404 Client Error: Not Found for url: https://finance.sina.com.cn/head/finance20240609am.shtml
+2024-06-10,am,HTTPError: 404 Client Error: Not Found for url: https://finance.sina.com.cn/head/finance20240610am.shtml
+2024-06-11,am,HTTPError: 404 Client Error: Not Found for url: https://finance.sina.com.cn/head/finance20240611am.shtml
+2024-06-18,am,HTTPError: 404 Client Error: Not Found for url: https://finance.sina.com.cn/head/finance20240618am.shtml
+2024-06-19,am,HTTPError: 404 Client Error: Not Found for url: https://finance.sina.com.cn/head/finance20240619am.shtml

@@ -1,0 +1,53 @@
+{
+  "name": "eps_consensus_30d_revision",
+  "category": "fundamental",
+  "expression": "(最新EPS一致预期 - 30日前EPS一致预期) / 30日前EPS一致预期",
+  "logic": "EPS一致预期上修反映市场对公司盈利改善的共识提升，驱动未来超额收益",
+  "source_insight": "锚定学术文献中一致预期修正因子框架，基于EPS预期边际变化构建",
+  "risk_warnings": "预期修正或受短期情绪干扰，中证500样本流动性或影响因子稳定性",
+  "code": "def compute_factor(df):\n    import pandas as pd\n    import numpy as np\n    # 兼容大小写的EPS一致预期列，输入df为面板数据（index=股票代码，columns=交易日期）\n    eps_cols = [col for col in df.columns if col.lower() == 'eps_consensus']\n    if not eps_cols:\n        return pd.Series(dtype='float64')\n    eps_df = df[eps_cols[0]]\n    # 转换列为日期类型并按时间排序，避免未来函数（确保最新日期在最后）\n    eps_df.columns = pd.to_datetime(eps_df.columns, errors='coerce')\n    eps_df = eps_df.dropna(axis=1, how='all').sort_index(axis=1)\n    # 计算30日修正幅度，确保无未来数据\n    if len(eps_df.columns) < 31:\n        return pd.Series(np.nan, index=df.index)\n    latest = eps_df.iloc[:, -1]\n    prev_30d = eps_df.iloc[:, -31]\n    factor = (latest - prev_30d) / prev_30d\n    # 处理除零与异常值\n    factor = factor.replace([np.inf, -np.inf], np.nan).fillna(np.nan)\n    return factor",
+  "metadata": {
+    "economic_attribution": "EPS一致预期上修反映市场盈利共识提升，预示未来超额收益",
+    "applicable_market_environment": [
+      "政策驱动成长市场",
+      "中证500成分股市场"
+    ],
+    "literature_source": "基于经典一致预期因子研究框架，锚定EPS预期边际变化逻辑",
+    "factor_type": "fundamental",
+    "rebalance_cycle": "月频",
+    "data_requirements": [
+      "EPS一致预期",
+      "股票代码",
+      "交易日期"
+    ]
+  },
+  "directional_constraint": {
+    "higher_is_better": true,
+    "original_direction": "positive",
+    "transformation": "none",
+    "note": ""
+  },
+  "source_query": "A股市场当前有效的超额收益来源",
+  "source_meta": {
+    "literature_source": "test-paper",
+    "rebalance_cycle": "月频"
+  },
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "之前公式运行失败"
+    },
+    {
+      "role": "assistant",
+      "content": "建议检查字段名和时序方向"
+    }
+  ],
+  "created_at": "2026-06-10T00:16:45",
+  "repair_log": [
+    {
+      "timestamp": "2026-06-10T00:16:45",
+      "error_info": "NameError: eps not defined",
+      "correct_advice": "改为使用可用字段并去除未来函数"
+    }
+  ]
+}

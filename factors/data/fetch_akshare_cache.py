@@ -33,12 +33,8 @@ SYMBOLS_FILE = CACHE_ROOT / "symbols_from_qlib.csv"
 
 AKSHARE_TASKS: list[dict[str, Any]] = [
     {
-        "func": "stock_financial_analysis_indicator",
-        "kwargs": {"symbol": "{symbol}", "start_year": "2015"},
-    },
-    {
-        "func": "stock_financial_abstract",
-        "kwargs": {"symbol": "{symbol}"},
+        "func": "stock_financial_analysis_indicator_em",
+        "kwargs": {"symbol": "{em_symbol}", "indicator": "按单季度"},
     },
     {
         "func": "stock_financial_report_sina",
@@ -54,10 +50,6 @@ AKSHARE_TASKS: list[dict[str, Any]] = [
         "func": "stock_financial_report_sina",
         "kwargs": {"stock": "{market_symbol}", "symbol": REPORT_CASH_FLOW},
         "output_name": "stock_financial_report_sina_cash_flow",
-    },
-    {
-        "func": "stock_dividend_cninfo",
-        "kwargs": {"symbol": "{symbol}"},
     },
 ]
 
@@ -94,6 +86,12 @@ def to_market_symbol(symbol: str) -> str:
     return f"sz{symbol}"
 
 
+def to_em_symbol(symbol: str) -> str:
+    if symbol.startswith(("5", "6", "9")):
+        return f"{symbol}.SH"
+    return f"{symbol}.SZ"
+
+
 def get_symbols_from_qlib() -> list[str]:
     from qlib.data import D
 
@@ -119,10 +117,15 @@ def get_symbols_from_qlib() -> list[str]:
 
 def render_kwargs(template_kwargs: dict[str, Any], symbol: str) -> dict[str, Any]:
     market_symbol = to_market_symbol(symbol)
+    em_symbol = to_em_symbol(symbol)
     rendered: dict[str, Any] = {}
     for k, v in template_kwargs.items():
         if isinstance(v, str):
-            rendered[k] = v.replace("{symbol}", symbol).replace("{market_symbol}", market_symbol)
+            rendered[k] = (
+                v.replace("{symbol}", symbol)
+                .replace("{market_symbol}", market_symbol)
+                .replace("{em_symbol}", em_symbol)
+            )
         else:
             rendered[k] = v
     return rendered

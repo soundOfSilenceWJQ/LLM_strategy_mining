@@ -18,23 +18,9 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from llm_quant.data.factor_store import FactorStore
 from llm_quant.data.info_store import InfoStore
+from llm_quant.prompts import render_market_assess_prompt
 from llm_quant.utils.llm_client import LLMClient
 from llm_quant.config import IAR_MAX_FACTORS, PAR_TOP_RATIO
-
-_MARKET_ASSESS_PROMPT = """你是一名资深量化投资组合经理。
-请根据以下最新市场信息，评估当前市场环境，并给出对各类因子的适配性调整建议。
-
-【最新市场信息】
-{market_context}
-
-请输出JSON格式：
-{{
-  "market_regime": "bull/bear/volatile/sideways",
-  "risk_appetite": "high/medium/low",
-  "recommended_factor_types": ["momentum", "value", ...],
-  "deprecated_factor_types":  ["...", "..."],
-  "rotation_reason": "风格轮动原因说明（100字以内）"
-}}"""
 
 
 class Selector:
@@ -210,7 +196,7 @@ class Selector:
             f"- {r.get('title','')}: {r.get('summary','')[:80]}"
             for r in recent
         ])
-        prompt = _MARKET_ASSESS_PROMPT.format(market_context=context)
+        prompt = render_market_assess_prompt(market_context=context)
         try:
             resp = self.llm.chat(user_message=prompt)
             data = json.loads(self._extract_json(resp))

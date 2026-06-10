@@ -1,0 +1,36 @@
+{
+  "date": "2026-06-10",
+  "counts": {
+    "items": 1,
+    "news": 1,
+    "reports": 0
+  },
+  "summary": {
+    "market_overview": "2026年6月10日市场信息面核心为监管层强调支持科技创新与产业升级，属政策利好类信息，暂无其他补充。",
+    "dominant_themes": [
+      "科技创新与产业升级"
+    ],
+    "pricing_logic_summary": "监管层强调支持科技创新与产业升级，或利好相关科技产业，提升相关资产估值预期，当前呈中性偏多信号。",
+    "bullish_signals": [
+      "监管层明确支持科技创新与产业升级"
+    ],
+    "bearish_signals": [],
+    "investor_advice": {
+      "stance": "偏谨慎",
+      "short_term": "轻仓观望，不参与未明确标的的炒作",
+      "swing_term": "等待政策落地或标的明确后再布局",
+      "risk_controls": [
+        "控制仓位不盲目追高",
+        "规避未明确标的的炒作"
+      ]
+    },
+    "watch_list": [
+      "科技创新相关行业的政策落地进展"
+    ],
+    "uncertainties": [
+      "政策支持科技创新的具体落地细则未明确",
+      "相关科技产业业绩兑现存在不确定性"
+    ]
+  },
+  "processed_at": "2026-06-10T00:16:01"
+}

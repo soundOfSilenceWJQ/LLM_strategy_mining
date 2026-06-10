@@ -1,0 +1,146 @@
+{
+  "date": "2026-06-10",
+  "counts": {
+    "raw_records": 1,
+    "analyzed_rows": 1,
+    "factors": 1
+  },
+  "analyzed_rows": [
+    {
+      "source_record": {
+        "source_type": "news",
+        "section": "宏观",
+        "report_type": "",
+        "title": "政策支持科技创新",
+        "url": "https://example.com/news/1",
+        "publish_time": "2026-06-10",
+        "publish_date": "2026-06-10",
+        "org": "",
+        "analyst": ""
+      },
+      "analysis": {
+        "main_content": "监管层强调支持科技创新与产业升级，为政策层面表态",
+        "pricing_logic": "政策支持科创与产业升级，利好相关科技类资产，或带动对应板块估值修复",
+        "market_impact": {
+          "direction": "中性偏多",
+          "target_assets": [
+            "科技创新相关行业"
+          ],
+          "horizon_days": 1,
+          "confidence": 0.3,
+          "reasoning": "政策仅表态支持科创，未明确具体措施，短期影响偏温和"
+        },
+        "investment_suggestion": {
+          "action": "观察",
+          "for_investor": "短线",
+          "holding_period_days": 1,
+          "position_guidance": "保持轻仓观望，不盲目参与相关标的",
+          "risk_controls": [
+            "警惕政策落地不及预期风险",
+            "避免盲目炒作相关科创标的"
+          ]
+        },
+        "risk_warnings": [
+          "政策未明确具体支持细则，利好确定性不足",
+          "短期情绪催化有限，难持续上涨"
+        ],
+        "evidence_quotes": [
+          "监管层强调支持科技创新与产业升级"
+        ]
+      },
+      "processed_at": "2026-06-10T00:17:20"
+    }
+  ],
+  "daily_summary": {
+    "date": "2026-06-10",
+    "counts": {
+      "items": 1,
+      "news": 1,
+      "reports": 0
+    },
+    "summary": {
+      "market_overview": "2026年6月10日，监管层表态支持科技创新与产业升级，为政策层面利好信号，暂无其他相关信息补充。",
+      "dominant_themes": [
+        "科技创新",
+        "产业升级"
+      ],
+      "pricing_logic_summary": "监管层政策支持科技创新与产业升级，利好相关科技类资产，或带动对应板块估值修复，当前呈中性偏多态势。",
+      "bullish_signals": [
+        "监管层明确表态支持科技创新与产业升级"
+      ],
+      "bearish_signals": [],
+      "investor_advice": {
+        "stance": "偏谨慎",
+        "short_term": "短线建议轻仓观望，不盲目参与相关标的",
+        "swing_term": "波段建议保持观望，等待政策落地明确信号",
+        "risk_controls": [
+          "控制仓位在轻仓水平",
+          "避免追高科技类标的"
+        ]
+      },
+      "watch_list": [
+        "科技创新相关行业",
+        "政策落地进展"
+      ],
+      "uncertainties": [
+        "政策支持的具体落地细则尚未明确",
+        "科技类资产估值修复的持续性待验证"
+      ]
+    },
+    "processed_at": "2026-06-10T00:17:28"
+  },
+  "factor_selection": {
+    "date": "2026-06-10",
+    "recommendation": {
+      "market_analysis": {
+        "current_regime": "政策驱动的科技创新与产业升级导向市场",
+        "dominant_factors": [
+          "盈利预期修正（科技创新方向）",
+          "政策驱动的成长风格"
+        ],
+        "risk_factors": [
+          "盈利预期修正不及预期",
+          "政策利好落地节奏慢于预期"
+        ],
+        "macroeconomic_outlook": "监管支持科技创新，成长板块盈利修复预期提升，政策红利释放中"
+      },
+      "recommended_factors": [
+        {
+          "factor_name": "eps_revision_30d",
+          "rationale": "监管支持科技创新，盈利预期向上修正标的受益政策红利，估值修复空间大",
+          "historical_ic": 0.0,
+          "recent_performance": "暂无公开历史表现，仅基于当前政策逻辑推导",
+          "expected_performance": "政策利好下，盈利预期向上修正标的有望获超额收益",
+          "weight": 1.0,
+          "risk_level": "中"
+        }
+      ],
+      "portfolio_composition": {
+        "total_weight": 1.0,
+        "concentration": "高度集中于单一盈利预期修正因子",
+        "diversification": "分散度极低，仅依赖单一基本面因子"
+      },
+      "factors_to_avoid": [],
+      "implementation_suggestions": {
+        "rebalance_frequency": "月度调整",
+        "entry_timing": "当前政策利好窗口，可布局相关标的",
+        "exit_signals": [
+          "盈利预期向下修正超10%",
+          "政策利好落地不及预期"
+        ],
+        "monitoring_metrics": [
+          "盈利预期修正幅度",
+          "政策落地进度"
+        ]
+      },
+      "confidence_level": "中",
+      "uncertainty_sources": [
+        "盈利预期修正的真实性",
+        "政策利好的持续性"
+      ],
+      "next_review_date": "2026-07-10"
+    },
+    "processed_at": "2026-06-10T00:17:44"
+  },
+  "processed_at": "2026-06-10T00:17:44"
+}
